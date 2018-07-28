@@ -1,7 +1,7 @@
 import os
 import re
 import json
-import eng_to_ipa.syllables as syllables
+from etoipa.eng_to_ipa import syllables
 import logging
 
 

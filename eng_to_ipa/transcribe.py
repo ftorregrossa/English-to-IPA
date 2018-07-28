@@ -1,12 +1,18 @@
 # -*- coding: utf-8 -*-
 import re
+import os
 from os.path import join, abspath, dirname
-import eng_to_ipa.stress as stress
+import etoipa.eng_to_ipa.stress as stress
 import sqlite3
 from collections import defaultdict
+import json
 
 conn = sqlite3.connect(join(abspath(dirname(__file__)), "./resources/CMU_dict.db"))
 c = conn.cursor()
+
+with open(os.path.join(os.path.abspath(os.path.dirname(__file__)),
+                       'resources','visemes.json'), "r") as visemes_json:
+    VISEMES = json.load(visemes_json)
 
 
 def preprocess(words):
@@ -175,13 +181,52 @@ def isin_cmu(word):
     return len(as_set) == len(set(word))
 
 
-def convert(text, retrieve_all=False, keep_punct=True, stress_marks='both'):
+def get_viseme(phoneme_map, language):
+
+    global VISEMES
+
+    viseme_str = ""
+    i = 0
+
+    while i < len(phoneme_map):
+
+        if phoneme_map[i] == " ":
+            viseme_str += " "
+        else:
+            if i + 1 < len(phoneme_map):
+                if (phoneme_map[i] + phoneme_map[i + 1]) in VISEMES["diphtong"]:
+                    viseme_str += VISEMES[language][phoneme_map[i] + phoneme_map[i + 1]]
+                    i += 1
+                else:
+                    viseme_str += VISEMES[language][phoneme_map[i]]
+            else:
+                viseme_str += VISEMES[language][phoneme_map[i]]
+
+        i += 1
+    return viseme_str
+
+def get_all_viseme(phoneme_map, language):
+    l = []
+    for wl in phoneme_map:
+        subl = []
+        for w in wl:
+            subl.append(get_viseme(w))
+        l.append(subl)
+    return l
+
+def convert(text, retrieve_all=False, keep_punct=True, stress_marks='both', viseme=False, viseme_language="british"):
     """takes either a string or list of English words and converts them to IPA"""
     ipa = ipa_list(
                    words_in=text,
                    keep_punct=keep_punct,
                    stress_marks=stress_marks
                    )
-    if retrieve_all:
-        return get_all(ipa)
-    return get_top(ipa)
+    
+    if viseme:
+        if retrieve_all:
+            return get_all_viseme(get_all(ipa), viseme_language)
+        return get_viseme(get_top(ipa), viseme_language)
+    else:
+        if retrieve_all:
+            return get_all(ipa)
+        return get_top(ipa)
