@@ -61,7 +61,7 @@ def _punct_replace_word(original, transcription):
 def fetch_words(words_in):
     """fetches a list of words from the database"""
     quest = "?, " * len(words_in)
-    c.execute(f"SELECT word, phonemes FROM dictionary WHERE word IN ({quest[:-2]})", words_in)
+    c.execute("SELECT word, phonemes FROM dictionary WHERE word IN ({})".format(quest[:-2]), words_in)
     result = c.fetchall()
     d = defaultdict(list)
     for k, v in result:
@@ -190,8 +190,8 @@ def get_viseme(phoneme_map, language):
 
     while i < len(phoneme_map):
 
-        if phoneme_map[i] == " ":
-            viseme_str += " "
+        if phoneme_map[i] in [" ", "'"]:
+            viseme_str += phoneme_map[i]
         else:
             if i + 1 < len(phoneme_map):
                 if (phoneme_map[i] + phoneme_map[i + 1]) in VISEMES["diphtong"]:

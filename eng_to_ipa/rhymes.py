@@ -14,9 +14,9 @@ def get_rhymes(word):
         return [get_rhymes(w) for w in word.split()]
     phones = remove_onset(preprocess(word))
     phones_full = get_cmu([preprocess(word)])[0][0]
-    c.execute(f"SELECT word, phonemes FROM dictionary WHERE phonemes "
-              f"LIKE \"%{phones}\" AND NOT word=\"{word}\" "  # don't count word as its own rhyme
-              f"AND NOT phonemes=\"{phones_full}\"")  # don't return results that are the same but spelled differently
+    c.execute("SELECT word, phonemes FROM dictionary WHERE phonemes "
+              "LIKE \"%{}\" AND NOT word=\"{}\" ".format(phones, word)  # don't count word as its own rhyme
+              "AND NOT phonemes=\"{}\"").format(phones_full)  # don't return results that are the same but spelled differently
     return sorted(list(set([r[0] for r in c.fetchall()])))
 
 
