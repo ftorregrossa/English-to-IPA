@@ -11,7 +11,7 @@ conn = sqlite3.connect(join(abspath(dirname(__file__)), "./resources/CMU_dict.db
 c = conn.cursor()
 
 with open(os.path.join(os.path.abspath(os.path.dirname(__file__)),
-                       'resources','visemes.json'), "r") as visemes_json:
+                       'resources','visemes.json'), "r", encoding='utf-8') as visemes_json:
     VISEMES = json.load(visemes_json)
 
 
