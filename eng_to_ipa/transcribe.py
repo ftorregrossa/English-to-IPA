@@ -84,7 +84,7 @@ def get_cmu(tokens_in):
                     ordered = get_cmu([l[0]])
                     ordered[0][0] += ' z' if l[1] == "S" else ""
                 else:
-                    print(l)
+                    ordered.append(["__IGNORE__" + word])
             except:
                 ordered.append(["__IGNORE__" + word])
     return ordered
