@@ -214,7 +214,7 @@ def get_all_viseme(phoneme_map, language):
         l.append(subl)
     return l
 
-def convert(text, retrieve_all=False, keep_punct=True, stress_marks='both', viseme=False, viseme_language="british"):
+def convert(text, retrieve_all=False, keep_punct=True, stress_marks='primary', viseme=False, viseme_language="british", no_stress=True):
     """takes either a string or list of English words and converts them to IPA"""
     ipa = ipa_list(
                    words_in=text,
@@ -222,11 +222,20 @@ def convert(text, retrieve_all=False, keep_punct=True, stress_marks='both', vise
                    stress_marks=stress_marks
                    )
     
+    ans = None
+    if no_stress:
+        if retrieve_all:
+            ans = get_all(ipa)
+            for i, l in enumerate(ans, 0):
+                for j, w in enumerate(l, 0):
+                    ans[i][j] = w.replace("ˈ", "").replace("ˌ", "")
+        else:
+            ans = get_top(ipa)
+            ans = ans.replace("ˈ", "").replace("ˌ", "")
+                    
     if viseme:
         if retrieve_all:
-            return get_all_viseme(get_all(ipa), viseme_language)
-        return get_viseme(get_top(ipa), viseme_language)
+            return get_all_viseme(ans, viseme_language)
+        return get_viseme(ans, viseme_language)
     else:
-        if retrieve_all:
-            return get_all(ipa)
-        return get_top(ipa)
+        return ans
