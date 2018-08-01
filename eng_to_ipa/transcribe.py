@@ -6,6 +6,7 @@ import etoipa.eng_to_ipa.stress as stress
 import sqlite3
 from collections import defaultdict
 import json
+from g2p_en.g2p import g2p
 
 conn = sqlite3.connect(join(abspath(dirname(__file__)), "./resources/CMU_dict.db"))
 c = conn.cursor()
@@ -79,18 +80,10 @@ def get_cmu(tokens_in):
             ordered.append(this_word[0])
         else:
             try:
-                l = word.split("'")
-                if len(l) > 1:
-                    to_order = get_cmu([l[0]])
-                    if to_order[0][0].startswith("__IGNORE__"):
-                        ordered.append([to_order[0][0] + ("$" if l[1] == "s" else "")])
-                    else:
-                        to_order[0][0] += ' z' if l[1] == "s" else ""
-                        ordered.append(to_order[0])
-                else:
-                    ordered.append(["__IGNORE__" + word])
+                ordered.append([" ".join([w.lower() for w in g2p(word)])])
             except:
                 ordered.append(["__IGNORE__" + word])
+    print(ordered)
     return ordered
 
 
