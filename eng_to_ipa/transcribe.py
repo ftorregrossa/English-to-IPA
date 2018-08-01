@@ -78,7 +78,12 @@ def get_cmu(tokens_in):
         if this_word:
             ordered.append(this_word[0])
         else:
-            ordered.append(["__IGNORE__" + word])
+            try:
+                l = tokens_in[0].split("'")
+                ordered = get_cmu([l[0]])
+                ordered[0][0] += ' z'
+            except:
+                ordered.append(["__IGNORE__" + word])
     return ordered
 
 
