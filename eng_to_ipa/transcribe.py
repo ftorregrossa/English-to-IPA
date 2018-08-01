@@ -80,8 +80,11 @@ def get_cmu(tokens_in):
         else:
             try:
                 l = tokens_in[0].split("'")
-                ordered = get_cmu([l[0]])
-                ordered[0][0] += ' z'
+                if len(l) > 1:
+                    ordered = get_cmu([l[0]])
+                    ordered[0][0] += ' z' if l[1] == "S" else ""
+                else:
+                    print(l)
             except:
                 ordered.append(["__IGNORE__" + word])
     return ordered
