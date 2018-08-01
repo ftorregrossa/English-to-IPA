@@ -83,7 +83,6 @@ def get_cmu(tokens_in):
                 ordered.append([" ".join([w.lower() for w in g2p(word)])])
             except:
                 ordered.append(["__IGNORE__" + word])
-    print(ordered)
     return ordered
 
 
@@ -256,7 +255,6 @@ def convert(text, retrieve_all=False, keep_punct=True, stress_marks='primary', v
         return get_viseme(ans, viseme_language)
     else:
         phonemes_words = ans.split(" ")
-        print(ans)
         final = []
         for w in phonemes_words:
             if "*" in w:
