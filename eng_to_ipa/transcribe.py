@@ -197,7 +197,6 @@ def get_viseme(phoneme_map, language):
     viseme_str = ""
 
     phoneme_words = phoneme_map.split(" ")
-    print(phoneme_words)
     viseme_words = []
 
     for w in phoneme_words:
