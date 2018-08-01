@@ -79,10 +79,11 @@ def get_cmu(tokens_in):
             ordered.append(this_word[0])
         else:
             try:
-                l = tokens_in[0].split("'")
+                l = word.split("'")
                 if len(l) > 1:
-                    ordered = get_cmu([l[0]])
-                    ordered[0][0] += ' z' if l[1] == "S" else ""
+                    to_order = get_cmu([l[0]])
+                    to_order[0][0] += ' z' if l[1] == "s" else ""
+                    ordered.append(to_order[0])
                 else:
                     ordered.append(["__IGNORE__" + word])
             except:
@@ -194,24 +195,34 @@ def get_viseme(phoneme_map, language):
     global VISEMES
 
     viseme_str = ""
-    i = 0
 
-    while i < len(phoneme_map):
+    phoneme_words = phoneme_map.split(" ")
+    print(phoneme_words)
+    viseme_words = []
 
-        if phoneme_map[i] in [" ", "'"]:
-            viseme_str += phoneme_map[i]
-        else:
-            if i + 1 < len(phoneme_map):
-                if (phoneme_map[i] + phoneme_map[i + 1]) in VISEMES["diphtong"]:
-                    viseme_str += VISEMES[language][phoneme_map[i] + phoneme_map[i + 1]]
-                    i += 1
+    for w in phoneme_words:
+        if w[-1] != "*":
+            viseme_str = ""
+            i=0
+            while i < len(w):
+
+                if w[i] in [" ", "'"]:
+                    viseme_str += w[i]
                 else:
-                    viseme_str += VISEMES[language][phoneme_map[i]]
-            else:
-                viseme_str += VISEMES[language][phoneme_map[i]]
+                    if i + 1 < len(w):
+                        if (w[i] + w[i + 1]) in VISEMES["diphtong"]:
+                            viseme_str += VISEMES[language][w[i] + w[i + 1]]
+                            i += 1
+                        else:
+                            viseme_str += VISEMES[language][w[i]]
+                    else:
+                        viseme_str += VISEMES[language][w[i]]
 
-        i += 1
-    return viseme_str
+                i += 1
+            viseme_words.append(viseme_str)
+        else:
+            viseme_words.append(w[:-1].upper())
+    return " ".join(viseme_words)
 
 def get_all_viseme(phoneme_map, language):
     l = []
@@ -246,4 +257,11 @@ def convert(text, retrieve_all=False, keep_punct=True, stress_marks='primary', v
             return get_all_viseme(ans, viseme_language)
         return get_viseme(ans, viseme_language)
     else:
-        return ans
+        phonemes_words = ans.split(" ")
+        final = []
+        for w in phonemes_words:
+            if w[-1] == "*":
+                final.append(w[:-1].upper())
+            else:
+                final.append(w)
+        return " ".join(final)
