@@ -82,8 +82,11 @@ def get_cmu(tokens_in):
                 l = word.split("'")
                 if len(l) > 1:
                     to_order = get_cmu([l[0]])
-                    to_order[0][0] += ' z' if l[1] == "s" else ""
-                    ordered.append(to_order[0])
+                    if to_order[0][0].startswith("__IGNORE__"):
+                        ordered.append([to_order[0][0] + ("$" if l[1] == "s" else "")])
+                    else:
+                        to_order[0][0] += ' z' if l[1] == "s" else ""
+                        ordered.append(to_order[0])
                 else:
                     ordered.append(["__IGNORE__" + word])
             except:
@@ -200,7 +203,7 @@ def get_viseme(phoneme_map, language):
     viseme_words = []
 
     for w in phoneme_words:
-        if w[-1] != "*":
+        if "*" not in w:
             viseme_str = ""
             i=0
             while i < len(w):
@@ -220,7 +223,10 @@ def get_viseme(phoneme_map, language):
                 i += 1
             viseme_words.append(viseme_str)
         else:
-            viseme_words.append(w[:-1].upper())
+            if "$" in w:
+                viseme_words.append(w.replace("*", "").replace("$", "").upper() + "z")
+            else:
+                viseme_words.append(w.replace("*", "").upper())
     return " ".join(viseme_words)
 
 def get_all_viseme(phoneme_map, language):
@@ -257,10 +263,14 @@ def convert(text, retrieve_all=False, keep_punct=True, stress_marks='primary', v
         return get_viseme(ans, viseme_language)
     else:
         phonemes_words = ans.split(" ")
+        print(ans)
         final = []
         for w in phonemes_words:
-            if w[-1] == "*":
-                final.append(w[:-1].upper())
+            if "*" in w:
+                if "$" in w:
+                    final.append(w.replace("*", "").replace("$", "").upper() + "z")
+                else:
+                    final.append(w.replace("*", "").upper())
             else:
                 final.append(w)
         return " ".join(final)
